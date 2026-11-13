@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>보호구 순서 맞추기</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#eaf2fc;color:#23324d;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.wrap{width:100%;max-width:900px;background:#fff;border-radius:24px;box-shadow:0 8px 30px rgba(40,70,120,.15);padding:24px 28px;position:relative}
+h1{font-size:28px;text-align:center;color:#24407a}
+.sub{text-align:center;color:#5a6b8c;margin-top:6px;font-size:16px}
+.bar{height:12px;background:#e3ebf7;border-radius:6px;margin:18px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3d7be0,#5bb48a);transition:width .4s}
+.meta{display:flex;justify-content:space-between;font-size:14px;color:#6b7a96}
+.item{margin:18px auto 20px;max-width:520px;border:3px dashed #b9cbe8;border-radius:20px;padding:18px;text-align:center;background:#f7faff;min-height:150px;display:flex;flex-direction:column;justify-content:center}
+.item .ic{font-size:56px;line-height:1.1}
+.item .nm{font-size:22px;font-weight:800;margin-top:8px}
+.item .ds{font-size:15px;color:#6b7a96;margin-top:6px}
+.bins{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.bin{border:3px solid #d5e0f2;border-radius:18px;background:#fff;padding:12px 8px;cursor:pointer;text-align:center;transition:.15s;user-select:none}
+.bin:hover{border-color:#3d7be0;transform:translateY(-3px);box-shadow:0 6px 14px rgba(61,123,224,.18)}
+.bin img,.bin svg{width:84px;height:84px;image-rendering:auto;display:block;margin:0 auto}
+.bin b{display:block;font-size:16px;margin-top:6px}
+.bin small{display:block;font-size:12.5px;color:#7a88a3;margin-top:2px}
+.bin.ok{border-color:#2e9a62;background:#ebf8f1}.bin.no{border-color:#d9534f;background:#fdeeee;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{margin-top:16px;border-radius:16px;padding:14px 18px;font-size:16px;line-height:1.55;display:none}
+.fb.ok{display:block;background:#ebf8f1;border:2px solid #9fd7b8;color:#1f6b45}
+.fb.no{display:block;background:#fdeeee;border:2px solid #f0b4b2;color:#9b2f2b}
+.btn{display:inline-block;margin-top:10px;background:#3d7be0;color:#fff;border:0;border-radius:24px;padding:10px 26px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:hover{background:#2f66c2}
+.center{text-align:center}
+.start p{font-size:17px;line-height:1.7;margin:16px 0;color:#3a4a68}
+.code{display:inline-block;margin:14px 0;font-size:40px;font-weight:900;letter-spacing:8px;color:#24407a;background:#eef4fd;border:3px solid #b9cbe8;border-radius:16px;padding:8px 26px}
+.hide{display:none}
+
+.stage{text-align:center;margin-top:14px;font-size:20px;font-weight:800;color:#24407a}
+.stage small{display:block;font-size:15px;font-weight:400;color:#6b7a96;margin-top:4px}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+.slot{border:3px dashed #b9cbe8;border-radius:16px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f7faff;color:#9aa8c2;font-size:22px;font-weight:800}
+.slot.fill{border-style:solid;border-color:#2e9a62;background:#ebf8f1;color:#1f6b45}
+.slot .ic{font-size:32px}.slot .t{font-size:14px;margin-top:4px;text-align:center;word-break:keep-all;line-height:1.3;padding:0 4px}
+.picks{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pk{border:3px solid #d5e0f2;border-radius:16px;background:#fff;padding:12px 6px;text-align:center;cursor:pointer;user-select:none;transition:transform .15s,border-color .15s}
+.pk:hover{border-color:#3d7be0;transform:translateY(-3px)}
+.pk .ic{font-size:34px}.pk b{display:block;font-size:15px;margin-top:4px;word-break:keep-all;line-height:1.3}
+.pk.used{opacity:0;pointer-events:none}
+.pk.no{border-color:#d9534f;background:#fdeeee;animation:shake .35s}
+@media(max-width:640px){.slots,.picks{grid-template-columns:repeat(3,1fr)}}
+</style></head><body><div class="wrap">
+<a href="index.html" style="position:absolute;left:20px;top:20px;color:#5a6b8c;text-decoration:none;font-size:15px">← 게임 고르기</a>
+<h1>보호구 순서 맞추기</h1>
+<div class="sub">보호구를 <b>입는 순서</b>와 <b>벗는 순서</b>대로 카드를 눌러 주세요!</div>
+
+<div id="start" class="start center">
+<p>1판은 <b>입을 때</b>, 2판은 <b>벗을 때</b> 순서예요.<br>아래 카드를 1번부터 차례대로 누르세요.<br>틀리면 힌트를 보고 다시 골라요.</p>
+<button class="btn" onclick="begin()">시작하기</button>
+</div>
+
+<div id="game" class="hide">
+<div class="bar"><i id="prog"></i></div>
+<div class="meta"><span id="cnt"></span><span id="err"></span></div>
+<div class="stage" id="stage"></div>
+<div class="slots" id="slots"></div>
+<div class="picks" id="picks"></div>
+<div class="fb" id="fb"></div>
+</div>
+
+<div id="end" class="hide center">
+<p style="font-size:22px;font-weight:800;margin-top:22px">보호구 순서 완료! 오늘 근무 수고했어요.</p>
+<p id="sum" style="margin-top:8px;color:#5a6b8c;font-size:17px"></p>
+<p style="margin-top:14px;font-size:17px">퇴근 비밀번호</p>
+<div class="code" id="code"></div>
+<p style="color:#6b7a96;font-size:15px">ZEP으로 돌아가 출퇴근 기록기에 비밀번호를 입력하세요.</p>
+<a class="btn" href="index.html" style="text-decoration:none;background:#7a88a3">다른 게임 고르기</a>
+</div>
+</div>
+<script>
+const PASSWORD="3824";
+const P={hand:{ic:"🧴",t:"손위생"},gown:{ic:"🥼",t:"가운"},mask:{ic:"😷",t:"마스크"},eye:{ic:"🥽",t:"고글·안면보호구"},glove:{ic:"🧤",t:"장갑"}};
+const STAGES=[
+ {name:"1판 · 보호구 입기",tip:"병실에 들어가기 전",seq:["hand","gown","mask","eye","glove"],
+  hint:{hand:"보호구를 만지기 전에 먼저 손부터 깨끗이 해요.",gown:"몸을 덮는 큰 보호구부터 입어요.",mask:"가운 다음은 얼굴이에요. 코와 입부터 가려요.",eye:"마스크를 쓴 뒤 고글이나 안면보호구로 눈을 가려요.",glove:"장갑은 맨 마지막! 가운 소매를 덮도록 껴요."},
+  done:"입을 때는 손위생 → 가운 → 마스크 → 고글·안면보호구 → 장갑. 장갑이 가운 소매를 덮어야 해요."},
+ {name:"2판 · 보호구 벗기",tip:"병실에서 나오기 전",seq:["glove","gown","eye","mask","hand"],
+  hint:{glove:"오염이 가장 심한 장갑부터 벗어요.",gown:"장갑 다음은 가운이에요. 오염된 바깥면이 안으로 가게 말아서 벗어요.",eye:"가운 다음은 고글·안면보호구예요. 앞면은 오염됐으니 끈이나 다리를 잡아요.",mask:"마스크는 가장 나중에 벗는 보호구예요. 앞면은 만지지 말고 끈만 잡아요.",hand:"보호구를 모두 벗은 뒤 바로 손위생!"},
+  done:"벗을 때는 오염이 가장 심한 것부터! 장갑 → 가운 → 고글·안면보호구 → 마스크 → 손위생. 오염된 앞면은 만지지 않아요."}
+];
+let s=0,step=0,errs=0;
+function shuffle(a){for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]]}return a}
+function begin(){s=0;errs=0;start.classList.add("hide");game.classList.remove("hide");load()}
+function load(){step=0;const st=STAGES[s];stage.innerHTML=`${st.name}<small>${st.tip}</small>`;
+ slots.innerHTML=st.seq.map((_,n)=>`<div class="slot" id="sl${n}">${n+1}</div>`).join("");
+ picks.innerHTML=shuffle(st.seq.slice()).map(k=>`<div class="pk" data-k="${k}" onclick="pick(this)"><div class="ic">${P[k].ic}</div><b>${P[k].t}</b></div>`).join("");
+ fb.className="fb";fb.innerHTML="";upd()}
+function upd(){cnt.textContent=`${s+1}판 / 2판`;err.textContent=`실수 ${errs}번`;prog.style.width=((s*5+step)/10*100)+"%"}
+function pick(el){const st=STAGES[s];if(step>=st.seq.length)return;const want=st.seq[step];
+ document.querySelectorAll(".pk").forEach(p=>p.classList.remove("no"));
+ if(el.dataset.k===want){const k=want;el.classList.add("used");const sl=document.getElementById("sl"+step);sl.classList.add("fill");sl.innerHTML=`<div class="ic">${P[k].ic}</div><div class="t">${step+1}. ${P[k].t}</div>`;step++;fb.className="fb";upd();
+  if(step===st.seq.length){fb.className="fb ok";fb.innerHTML=`<b>${st.name} 완료!</b><br>${st.done}<br><button class="btn" onclick="nextStage()">${s===0?"2판 벗기로":"결과 보기"}</button>`}}
+ else{errs++;void el.offsetWidth;el.classList.add("no");fb.className="fb no";fb.innerHTML=`<b>${step+1}번은 ${P[el.dataset.k].t}이(가) 아니에요.</b><br>${st.hint[want]}`;upd()}}
+function nextStage(){s++;if(s<STAGES.length)load();else{prog.style.width="100%";game.classList.add("hide");end.classList.remove("hide");
+ sum.textContent=errs===0?"한 번도 틀리지 않았어요! 완벽해요.":`실수 ${errs}번 — 힌트를 다시 떠올려 봐요.`;code.textContent=PASSWORD}}
+</script></body></html>
